@@ -1,41 +1,14 @@
 import numpy as np
 
-class MyNetwork1:
-    def __init__(self, weights, biases, epochs, batch_size, momentum=0.9, learning_rate=0.1) -> None:
-        """
-        Parameters
-        ----------
-        weights : ndarray or list of ndarray
-            A list of ndarrays (or a single ndarray if there is only one dimension)
-            corresponding to the weights of the network.
-            Each weight has the same shape as f.
-        
-        biases : ndarray or list of ndarray
-            A list of ndarrays (or a single ndarray if there is only one dimension)
-            corresponding to the biases of the network.
-            Each bias has the same shape as f.
-        
-        epochs : int
-            The number of epochs to train for.
-        
-        batch_size : int
-            The size of the batches to use for training.
-        
-        momentum : float, optional
-            The momentum to use for training.
-            Standard is 0.9
-        
-        learning_rate : float, optional
-            The learning rate to use for training.
-            Standard is 0.1
-        """
-        #One input, one output -> one layer
-        self.layers = 1
+class MyNetwork:
+    def __init__(self, weights:list, biases:list, epochs:int, layers:int, input_dim:int, output_dim:int, momentum:float=0.9, learning_rate:float=0.1) -> None:
+        self.layers = layers
         self.weights = np.array(weights)
         self.biases = biases
         self.epochs = epochs
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         self.learning_rate = learning_rate
-        self.batch_size = batch_size
         self.momentum = momentum
         #Velocity starts out at 0
         self.velocity = 0.0
@@ -49,7 +22,6 @@ class MyNetwork1:
             for scenario in training_data:
                 #backpropagation starts
                 self.backpropagation(np.array(scenario[0]), np.array(scenario[1]))
-                print("weights: ", self.weights)
 
     def sigmoid(self, x) -> float:
         """A quick calculation of the sigmoid function."""
@@ -60,8 +32,11 @@ class MyNetwork1:
         return self.sigmoid(x) * (1.0 - self.sigmoid(x))
 
     def loss(self, output, target) -> float:
-        """A quick calculation of the loss function using the sun of squares method."""
-        return np.sum(np.square(output - target))
+        """A quick calculation of the loss function or cost using the mean square method."""
+
+        difference = output - target
+        differences_squared = difference ** 2
+        return differences_squared.mean()
 
     def forwardspropagation(self, input_matrix)-> np.ndarray:
         """Forwardspropagation of the network using the sigmoid function.
@@ -95,7 +70,8 @@ class MyNetwork1:
         prediction_y= self.forwardspropagation(input_matrix)
         #calculate the loss
         loss = self.loss(prediction_y, target)
-        
+        print(f"{loss=}")
+
         #calculate the gradients
         for i in range(self.layers):
             #calculate the gradient for the weights
